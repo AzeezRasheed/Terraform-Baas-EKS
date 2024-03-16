@@ -1,0 +1,12 @@
+podDisruptionBudget:
+  maxUnavailable: 1
+rbac:
+  create: true
+resources:
+  limits:
+    cpu: 100m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+

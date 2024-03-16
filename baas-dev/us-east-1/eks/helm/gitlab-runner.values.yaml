@@ -1,0 +1,98 @@
+
+rbac:
+  create: true
+  clusterWideAccess: true
+  rules:
+  - apiGroups: ["autoscaling.k8s.io"]
+    resources: ["verticalpodautoscalers"]
+    verbs: ["list", "get", "create", "update", "delete", "patch", "watch"]
+  - apiGroups: ["keda.sh"]
+    resources: ["verticalpodautoscalers"]
+    verbs: ["list", "get", "create", "update", "delete", "patch", "watch"]
+  - apiGroups: ["external-secrets.io"]
+    resources: ["externalsecrets"]
+    verbs: ["list", "get", "create", "update", "delete", "patch", "watch"]
+  - apiGroups: ["monitoring.coreos.com"]
+    resources: ["alertmanagers", "prometheuses", "prometheuses/finalizers", "servicemonitors"]
+    verbs: ["list", "get", "create", "update", "delete", "patch", "watch"]
+  - apiGroups: ["autoscaling"]
+    resources: ["horizontalpodautoscalers"]
+    verbs: ["list", "get", "create", "update", "delete", "patch", "watch"]
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["list", "get", "create", "update", "delete", "patch", "watch"]
+  - apiGroups: ["networking.k8s.io", "extensions"]
+    resources: ["ingresses"]
+    verbs: ["list", "get", "create", "update", "delete", "patch", "watch"]
+  - apiGroups: ["extensions", "apps", "batch"]
+    resources: ["deployments", "deployments/scale", "replicasets","jobs"]
+    verbs: ["list", "get", "create", "update", "delete", "patch", "watch"]
+  - apiGroups: [""]
+    resources: ["services", "secrets", "configmaps", "serviceaccounts"]
+    verbs: ["list", "get", "create", "update", "delete", "patch", "watch"]
+  - apiGroups: [""]
+    resources: ["pods", "pods/exec", "pods/attach"]
+    verbs: ["list", "get", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["namespaces"]
+    verbs: ["list", "get", "create"]
+useTini: false
+replicas: 1
+gitlabUrl: https://gitlab.com
+
+## Configuration for the Pods that the runner launches for each new job
+##
+runners:
+  # runner configuration, where the multi line strings is evaluated as
+  # template so you can specify helm values inside of it.
+  #
+  # tpl: https://helm.sh/docs/howto/charts_tips_and_tricks/#using-the-tpl-function
+  # runner configuration: https://docs.gitlab.com/runner/configuration/advanced-configuration.html
+  config: |
+    [[runners]]
+      [runners.kubernetes]
+        namespace = "{{.Release.Namespace}}"
+        image = "ubuntu:16.04"
+        service_account = "gitlab-runner"
+        # cpu_limit = "1"
+        # cpu_limit_overwrite_max_allowed = "4"
+        # cpu_request = "100m"
+        # cpu_request_overwrite_max_allowed = "2"
+        # helper_cpu_limit = "1"
+        # helper_cpu_limit_overwrite_max_allowed = "4"
+        # helper_cpu_request = "100m"
+        # helper_cpu_request_overwrite_max_allowed = "2"
+        # service_cpu_limit = "1"
+        # service_cpu_limit_overwrite_max_allowed = "4"
+        # service_cpu_request = "100m"
+        # service_cpu_request_overwrite_max_allowed = "2"
+        # memory_limit = "1Gi"
+        # memory_limit_overwrite_max_allowed = "4Gi"
+        # memory_request = "100Mi"
+        # memory_request_overwrite_max_allowed = "2Gi"
+        # helper_memory_limit = "250m"
+        # helper_memory_limit_overwrite_max_allowed = "4Gi"
+        # helper_memory_request = "100m"
+        # helper_memory_request_overwrite_max_allowed = "2Gi"
+        # service_memory_limit = "1Gi"
+        # service_memory_limit_overwrite_max_allowed = "4Gi"
+        # service_memory_request = "100Mi"
+        # service_memory_request_overwrite_max_allowed = "2Gi"
+      [runners.cache]
+        # Path = "cache"
+        # Type = "s3"
+        # Shared = false
+        # [runners.cache.s3]
+        #   ServerAddress = "s3.amazonaws.com"
+        #   BucketName = "tf-arival-dev-s3-gitlab-runner-cache"
+        #   BucketLocation = "us-east-1"
+        #   Insecure = false
+        #   ServerSideEncryption = "S3"
+
+resources: |
+  limits:
+    memory: 256Mi
+    cpu: 200m
+  requests:
+    memory: 128Mi
+    cpu: 100m

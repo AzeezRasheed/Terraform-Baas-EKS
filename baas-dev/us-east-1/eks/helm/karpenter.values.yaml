@@ -1,0 +1,8 @@
+controller:
+  resources:
+   requests:
+     cpu: "0.25"
+     memory: 256Mi
+   limits:
+     cpu: "0.25"
+     memory: 256Mi
